@@ -5,6 +5,7 @@ const Vehicle = require("./model/vehicle");
 const Parking = require("./model/parking");
 const ParkingLot = require("./model/parking_lot");
 const IdCard = require("./model/id_card");
+const parking_lot = require("./model/parking_lot");
 
 const app = express();
 
@@ -37,7 +38,16 @@ app.get("/parking/:id", (req, res) => {
 });
 
 app.get("/parking_lots", (req, res) => {
-  res.send("All parking lots!");
+  try {
+    ParkingLot.find({}, function (err, all) {
+      if (err) {
+        res.status(404).send();
+      }
+      res.send(all);
+    });
+  } catch (error) {
+    res.status(500).send();
+  }
 });
 
 app.post("/new_vehicle", async (req, res) => {
