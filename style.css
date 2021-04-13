@@ -1,0 +1,24 @@
+*{
+    padding: 0;
+    margin: 0;
+}
+
+.title{
+    text-align: center;
+    background-color: rgb(132, 0, 255);
+}
+
+.form-input{
+    width: 300px;
+    padding: 16px;
+    border: 1px solid #b6b6b6;
+    border-radius: 5px;
+    float: left;
+    margin: 16px;
+}
+
+.list-car{
+    float: left;
+    width: 700px;
+    margin: 16px;
+}
