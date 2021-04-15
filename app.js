@@ -1,11 +1,12 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const formidable = require("formidable");
+var multer = require("multer");
+var upload = multer({ dest: "uploads/" });
 
 const Vehicle = require("./model/vehicle");
 const Parking = require("./model/parking");
 const ParkingLot = require("./model/parking_lot");
-const IdCard = require("./model/id_card");
-const parking_lot = require("./model/parking_lot");
 
 const app = express();
 
@@ -38,6 +39,7 @@ app.get("/parking/:id", (req, res) => {
 });
 
 app.get("/parking_lots", (req, res) => {
+  console.log("a");
   try {
     ParkingLot.find({}, function (err, all) {
       if (err) {
@@ -70,6 +72,19 @@ app.post("/parking", async (req, res) => {
   } catch (error) {
     res.status(400).send(error);
   }
+});
+
+app.get("/data", function (req, res) {
+  res.sendFile(__dirname + "/test.html");
+});
+
+app.post("/data", (req, res) => {
+  const form = new formidable.IncomingForm();
+  form.parse(req, function (err, fields, files) {
+    console.log(files.file.name);
+    res.send(123);
+  });
+  res.send(123);
 });
 
 app.post("/parking_lot", async (req, res) => {
