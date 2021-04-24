@@ -1,26 +1,36 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const formidable = require("formidable");
-var multer = require("multer");
-var upload = multer({ dest: "uploads/" });
+const fs = require("fs");
+const path = require("path");
+const bodyParser = require("body-parser");
+const http = require("http");
 
 const Vehicle = require("./model/vehicle");
 const Parking = require("./model/parking");
 const ParkingLot = require("./model/parking_lot");
-
 const app = express();
-
+app.set("view engine", "ejs");
 app.use(express.json());
+app.use(express.static("public"));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
 
-app.get("/vehicle/:id", async (req, res) => {
-  const _id = req.params.id;
+app.get("/", (req, res) => {
+  let row = [];
+  row[0] = "";
+  row[1] = "";
+  row[3] = "";
+  res.render("index", { data: row });
+});
+
+app.get("/parking", async (req, res) => {
   try {
-    const vehicle = await Vehicle.findById(_id);
-    if (!vehicle) {
-      return res.status(404).send();
-    }
-    res.send(vehicle);
-  } catch (error) {
+    let parkings = [];
+    parkings = await Parking.find({}).lean();
+    res.render("listParking", { parkings });
+  } catch (err) {
+    console.log(err);
     res.status(500).send();
   }
 });
@@ -39,7 +49,6 @@ app.get("/parking/:id", (req, res) => {
 });
 
 app.get("/parking_lots", (req, res) => {
-  console.log("a");
   try {
     ParkingLot.find({}, function (err, all) {
       if (err) {
@@ -52,39 +61,88 @@ app.get("/parking_lots", (req, res) => {
   }
 });
 
-app.post("/new_vehicle", async (req, res) => {
-  const vehicle = new Vehicle(req.body);
-  try {
-    await vehicle.save();
-    res.send(vehicle);
-    res.status(201).send;
-  } catch (error) {
-    res.send({ message: error });
-  }
-});
-
 app.post("/parking", async (req, res) => {
   const parking = new Parking(req.body);
   try {
     await parking.save();
-    res.send(parking);
-    res.status(201).send;
+    res.redirect("http://localhost:3000/data");
+    // sendSignal();
+    res.status(201).send();
   } catch (error) {
     res.status(400).send(error);
   }
 });
 
-app.get("/data", function (req, res) {
-  res.sendFile(__dirname + "/test.html");
+app.get("/in", async (req, res) => {
+  await fs.readdir("./public/in", (err, files) => {
+    let row = [];
+    row[0] = files[0].split(".")[0];
+    row[1] = files[0].split(".")[1];
+    row[3] = "/in/" + files[0];
+    return res.render("in", { data: row });
+  });
 });
 
-app.post("/data", (req, res) => {
-  const form = new formidable.IncomingForm();
-  form.parse(req, function (err, fields, files) {
-    console.log(files.file.name);
-    res.send(123);
+app.get("/out", async (req, res) => {
+  await fs.readdir("./public/out", (err, files) => {
+    let row = [];
+    row[0] = files[0].split(".")[0];
+    row[1] = files[0].split(".")[1];
+    row[3] = "/out/" + files[0];
+    return res.render("out", { data: row });
   });
-  res.send(123);
+});
+
+app.post("/out", async (req, res) => {
+  const id_card = req.body.id_card;
+  const plate_number = req.body.plate_number;
+  try {
+    const parking = await Parking.findOne({ id_card });
+
+    if (!parking) {
+      res.redirect("http://localhost:3000/out");
+      return res.status(404).send();
+    }
+
+    if (parking.vehicle_number === plate_number) {
+      await Parking.deleteOne({ id_card });
+      // sendSignal()
+      return res.status(200).send();
+    } else {
+      res.redirect("http://localhost:3000/out");
+      return res.status(404).send();
+    }
+  } catch (error) {
+    return res.status(500).send();
+  }
+});
+
+app.post("/in", async (req, res) => {
+  let src = "";
+  const form = new formidable.IncomingForm();
+  await form.parse(req, function (err, fields, files) {
+    var rawData = fs.readFileSync(files.file.path);
+    var newPath = path.join(__dirname, "public/in") + "/" + files.file.name;
+    fs.writeFile(newPath, rawData, function (err) {
+      if (err) console.log(err);
+      a = newPath;
+    });
+  });
+  await timeout(10);
+  sendImage(src);
+  return res.send("Received image!");
+});
+
+app.post("/out", async (req, res) => {
+  const form = new formidable.IncomingForm();
+  await form.parse(req, function (err, fields, files) {
+    var rawData = fs.readFileSync(files.file.path);
+    var newPath = path.join(__dirname, "public/out") + "/" + files.file.name;
+    fs.writeFile(newPath, rawData, function (err) {
+      if (err) console.log(err);
+    });
+  });
+  res.send("Received image!");
 });
 
 app.post("/parking_lot", async (req, res) => {
@@ -98,36 +156,78 @@ app.post("/parking_lot", async (req, res) => {
   }
 });
 
-app.delete("/parkings/:id", async (req, res) => {
-  try {
-    const parking = await Parking.find({ id_card: req.params.id })
-      .select("id_card")
-      .remove()
-      .exec();
-    if (!parking) {
-      return res.status(404).send();
-    }
-    res.send(parking);
-  } catch (error) {
-    return res.status(500).send();
-  }
+// ----------------------------------test------------------------------
+app.get("/data", (req, res) => {
+  res.render("test");
 });
+app.post("/data", async (req, res) => {
+  sendImage();
+  res.redirect("http://localhost:3000/data");
+});
+// ----------------------------------test------------------------------
 
-app.patch("/parking_lot/:id", async (req, res) => {
-  // const parking_lot = await ParkingLot.find({
-  //   id_parking: req.params.id,
-  // });
-  // console.log(parking_lot[0].id_parking);
-  // console.log(req.body.id_parking);
-  // parking_lot[0].id_parking = req.body.id_parking;
-  // parking_lot[0].status = req.body.status;
-  // parking_lot[0].save();
-  console.log(req.params.id);
-  ParkingLot.findOneAndUpdate(
-    { _id: `${req.params.id}` },
-    { id_parking: `${req.body.id_parking}` }
-  );
-});
+async function sendImage(src) {
+  var FormData = require("form-data");
+
+  var form = new FormData();
+  form.append("file", fs.createReadStream(src));
+  // __dirname + `/public/in/${image}`
+  form.append("message", "Controller");
+
+  var options = {
+    host: "127.0.0.1",
+    port: 5000,
+    path: "/data",
+    method: "POST",
+    headers: form.getHeaders(),
+  };
+
+  var request = http.request(options, function (res) {
+    console.log(res);
+  });
+
+  form.pipe(request);
+
+  request.on("error", function (error) {
+    console.log(error);
+  });
+}
+
+function sendSignal() {
+  const data = JSON.stringify({
+    todo: "Open barrier",
+  });
+
+  const options = {
+    hostname: "192.168.1.2",
+    port: 5000,
+    path: "/test",
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Content-Length": data.length,
+    },
+  };
+
+  const request = http.request(options, (response) => {
+    console.log(`statusCode: ${response.statusCode}`);
+
+    response.on("data", (d) => {
+      process.stdout.write(d);
+    });
+  });
+
+  request.on("error", (error) => {
+    console.error(error);
+  });
+
+  request.write(data);
+  request.end();
+}
+
+function timeout(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
 mongoose.connect(
   "mongodb://127.0.0.1:27017/pbl5",

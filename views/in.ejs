@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="style.css" />
+    <!-- <link rel="stylesheet" href="style.css" /> -->
     <link
       rel="stylesheet"
       href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
@@ -16,27 +16,30 @@
   <body>
     <div class="container-fluid">
       <div class="title">
-        <h1>QUẢN LÝ BÃI ĐỖ XE</h1>
+        <h1>XE RA</h1>
       </div>
     </div>
     <div class="container">
       <div class="form-input">
         <img
           class="card-img-top"
-          src="./uploads/102180237.74l1-28156.jpg"
+          id="img"
+          src="<%=data[3] %>"
           alt="Card image cap"
+          style="width: 40%; height: 50%"
         />
-        <form action="/http://localhost:3000/data" method="POST">
+        <form action="http://localhost:3000/parking" method="POST" id="form">
           <h4 class="card-title">Thông Tin Xe</h4>
           <div class="form-group">
             <label for="formGroupExampleInput">Mã thẻ từ</label>
+            <% if(data) {%>
             <input
               type="text"
               class="form-control"
               id="formGroupExampleInput"
               placeholder="ID thẻ từ"
-              name="idthetu"
-              value=""
+              name="id_card"
+              value="<%=data[0] %>"
             />
           </div>
           <div class="form-group">
@@ -46,39 +49,18 @@
               class="form-control"
               id="formGroupExampleInput2"
               placeholder="Biển số xe"
-              name="biensoxe"
+              name="vehicle_number"
+              value="<%=data[1] %>"
             />
           </div>
-          <button type="submit" class="btn btn-danger">Xóa</button>
+          <!-- <button type="submit" class="btn btn-danger">Xóa</button> -->
           <button type="submit" class="btn btn-primary">Thêm</button>
+          <br />
         </form>
-      </div>
-
-      <div class="list-car">
-        <table class="table table-bordered">
-          <thead class="thead-dark">
-            <tr>
-              <th>STT</th>
-              <th>Mã Thẻ Từ</th>
-              <th>Biển Số Xe</th>
-              <th>Thao Tác</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <th scope="row">1</th>
-              <td>787DS</td>
-              <td>74L1-00866</td>
-              <td><a href="#">Sửa</a></td>
-            </tr>
-            <tr>
-              <th scope="row">2</th>
-              <td>812SD</td>
-              <td>74L1-8166</td>
-              <td><a href="#">Sửa</a></td>
-            </tr>
-          </tbody>
-        </table>
+        <a href="http://localhost:3000/parking">List parking</a>
+        <br />
+        <a href="http://localhost:3000/in">Vao</a>
+        <% } %>
       </div>
     </div>
   </body>
