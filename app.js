@@ -21,7 +21,7 @@ app.get("/", (req, res) => {
   row[0] = "";
   row[1] = "";
   row[3] = "";
-  res.render("index", { data: row });
+  res.render("in", { data: row });
 });
 
 app.get("/parking", async (req, res) => {
@@ -65,19 +65,35 @@ app.post("/parking", async (req, res) => {
   const parking = new Parking(req.body);
   try {
     await parking.save();
-    res.redirect("http://localhost:3000/data");
+    res.redirect("http://localhost:3000/");
     // sendSignal();
     res.status(201).send();
   } catch (error) {
     res.status(400).send(error);
   }
+  res.status(200).send();
 });
 
 app.get("/in", async (req, res) => {
+  var d = new Date();
+  now =
+    d.getFullYear() +
+    "/" +
+    d.getMonth() +
+    "/" +
+    d.getDate() +
+    " " +
+    d.getHours() +
+    ":" +
+    d.getMinutes() +
+    ":" +
+    d.getSeconds();
+
   await fs.readdir("./public/in", (err, files) => {
     let row = [];
     row[0] = files[0].split(".")[0];
     row[1] = files[0].split(".")[1];
+    row[2] = now;
     row[3] = "/in/" + files[0];
     return res.render("in", { data: row });
   });
@@ -120,15 +136,18 @@ app.post("/out", async (req, res) => {
 app.post("/in", async (req, res) => {
   let src = "";
   const form = new formidable.IncomingForm();
+  deleteIfExist();
   await form.parse(req, function (err, fields, files) {
     var rawData = fs.readFileSync(files.file.path);
     var newPath = path.join(__dirname, "public/in") + "/" + files.file.name;
     fs.writeFile(newPath, rawData, function (err) {
       if (err) console.log(err);
-      a = newPath;
+      src = newPath;
     });
+    console.log("da nhan tu ras");
   });
-  await timeout(10);
+  console.log(src);
+  await timeout(1000);
   sendImage(src);
   return res.send("Received image!");
 });
@@ -156,6 +175,13 @@ app.post("/parking_lot", async (req, res) => {
   }
 });
 
+app.post("/getBack", async (req, res) => {
+  const plate_number = req.body.message;
+  console.log(plate_number);
+  await renameFile(plate_number);
+  res.status(200).send();
+});
+
 // ----------------------------------test------------------------------
 app.get("/data", (req, res) => {
   res.render("test");
@@ -166,6 +192,18 @@ app.post("/data", async (req, res) => {
 });
 // ----------------------------------test------------------------------
 
+async function renameFile(newName) {
+  let old = "";
+  await fs.readdir("./public/in", (err, files) => {
+    old = files[0];
+  });
+  await timeout(10);
+  fs.renameSync(
+    `./public/in/${old}`,
+    `./public/in/${old.split(".")[0]}.${newName}.jpg`
+  );
+}
+
 async function sendImage(src) {
   var FormData = require("form-data");
 
@@ -175,7 +213,7 @@ async function sendImage(src) {
   form.append("message", "Controller");
 
   var options = {
-    host: "127.0.0.1",
+    host: "192.168.1.3",
     port: 5000,
     path: "/data",
     method: "POST",
@@ -199,7 +237,7 @@ function sendSignal() {
   });
 
   const options = {
-    hostname: "192.168.1.2",
+    hostname: "192.168.1.6",
     port: 5000,
     path: "/test",
     method: "POST",
@@ -227,6 +265,25 @@ function sendSignal() {
 
 function timeout(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function deleteIfExist() {
+  fs.readdir("./public/in", function (err, files) {
+    if (err) {
+      console.log(err);
+    } else {
+      if (!files.length) {
+        return false;
+      } else {
+        for (const file of files) {
+          fs.unlink(path.join("./public/in", file), (err) => {
+            if (err) throw err;
+          });
+        }
+        return true;
+      }
+    }
+  });
 }
 
 mongoose.connect(
