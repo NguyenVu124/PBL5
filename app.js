@@ -5,8 +5,6 @@ const fs = require("fs");
 const path = require("path");
 const bodyParser = require("body-parser");
 const http = require("http");
-
-const Vehicle = require("./model/vehicle");
 const Parking = require("./model/parking");
 const ParkingLot = require("./model/parking_lot");
 const app = express();
@@ -62,15 +60,21 @@ app.get("/parking_lots", (req, res) => {
 });
 
 app.post("/parking", async (req, res) => {
+  const position = await hintLot();
   const parking = new Parking(req.body);
-  const parking_lot = new ParkingLot({
-    id_card: req.body.id_card,
-    status: true,
-  });
-
   try {
     await parking.save();
-    await parking_lot.save();
+    await ParkingLot.updateOne(
+      { position },
+      {
+        position,
+        id_card: req.body.id_card,
+        status: true,
+      },
+      (err) => {
+        if (err) console.log(err);
+      }
+    );
     res.redirect("http://localhost:3000/");
     // sendSignal();
     res.status(201).send();
@@ -158,17 +162,17 @@ app.post("/in", async (req, res) => {
   return res.send("Received image!");
 });
 
-app.post("/out", async (req, res) => {
-  const form = new formidable.IncomingForm();
-  await form.parse(req, function (err, fields, files) {
-    var rawData = fs.readFileSync(files.file.path);
-    var newPath = path.join(__dirname, "public/out") + "/" + files.file.name;
-    fs.writeFile(newPath, rawData, function (err) {
-      if (err) console.log(err);
-    });
-  });
-  res.send("Received image!");
-});
+// app.post("/out", async (req, res) => {
+//   const form = new formidable.IncomingForm();
+//   await form.parse(req, function (err, fields, files) {
+//     var rawData = fs.readFileSync(files.file.path);
+//     var newPath = path.join(__dirname, "public/out") + "/" + files.file.name;
+//     fs.writeFile(newPath, rawData, function (err) {
+//       if (err) console.log(err);
+//     });
+//   });
+//   res.send("Received image!");
+// });
 
 app.post("/parking_lot", async (req, res) => {
   const parking_lot = new ParkingLot(req.body);
@@ -189,7 +193,7 @@ app.post("/getBack", async (req, res) => {
 });
 
 // ----------------------------------test------------------------------
-app.get("/test", (req, res) => {});
+app.get("/test", async (req, res) => {});
 app.post("/data", async (req, res) => {
   sendImage();
   res.redirect("http://localhost:3000/data");
@@ -294,7 +298,7 @@ async function hintLot() {
   try {
     let lots = [];
     lots = await ParkingLot.find({ status: false }).lean();
-    return lots[0];
+    return lots[0].position;
   } catch (err) {
     console.log(err);
     res.status(500).send();
