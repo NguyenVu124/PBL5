@@ -16,7 +16,7 @@ app.use(express.static("public"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
-app.get("/", (req, res) => {
+app.get("/", async (req, res) => {
   let row = [];
   row[0] = "";
   row[1] = "";
@@ -63,8 +63,14 @@ app.get("/parking_lots", (req, res) => {
 
 app.post("/parking", async (req, res) => {
   const parking = new Parking(req.body);
+  const parking_lot = new ParkingLot({
+    id_card: req.body.id_card,
+    status: true,
+  });
+
   try {
     await parking.save();
+    await parking_lot.save();
     res.redirect("http://localhost:3000/");
     // sendSignal();
     res.status(201).send();
@@ -183,9 +189,7 @@ app.post("/getBack", async (req, res) => {
 });
 
 // ----------------------------------test------------------------------
-app.get("/data", (req, res) => {
-  res.render("test");
-});
+app.get("/test", (req, res) => {});
 app.post("/data", async (req, res) => {
   sendImage();
   res.redirect("http://localhost:3000/data");
@@ -284,6 +288,17 @@ function deleteIfExist() {
       }
     }
   });
+}
+
+async function hintLot() {
+  try {
+    let lots = [];
+    lots = await ParkingLot.find({ status: false }).lean();
+    return lots[0];
+  } catch (err) {
+    console.log(err);
+    res.status(500).send();
+  }
 }
 
 mongoose.connect(

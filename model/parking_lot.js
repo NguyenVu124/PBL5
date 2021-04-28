@@ -1,16 +1,13 @@
 const mongoose = require("mongoose");
 
 const ParkingLot = new mongoose.Schema({
-  id_parking: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "parking",
+  id_card: {
+    // type: mongoose.Schema.Types.ObjectId,
+    // ref: "parking",
+    type: String,
   },
   status: {
     type: Boolean,
-    required: true,
-  },
-  type: {
-    type: String,
     required: true,
   },
 });
