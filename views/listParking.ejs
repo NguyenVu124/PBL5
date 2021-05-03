@@ -1,66 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <title>Table V04</title>
     <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
-    <link rel="stylesheet" href="style.css" />
-    <style>
-      * {
-        padding: 0;
-        margin: 0;
-      }
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-      .title {
-        text-align: center;
-        background-color: rgb(132, 0, 255);
-      }
-
-      .form-input {
-        width: 300px;
-        padding: 16px;
-        border: 1px solid #b6b6b6;
-        border-radius: 5px;
-        float: left;
-        margin: 16px;
-      }
-
-      .list-car {
-        float: left;
-        width: 700px;
-        margin: 16px;
-      }
-    </style>
     <link
       rel="stylesheet"
-      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
-      integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
-      crossorigin="anonymous"
+      type="text/css"
+      href="vendor/bootstrap/css/bootstrap.min.css"
     />
+
+    <link rel="stylesheet" type="text/css" href="css/list.css" />
   </head>
   <body>
-    <h1>List Parkings</h1>
-    <div class="list-car">
-      <table class="table table-bordered">
-        <thead class="thead-dark">
-          <tr>
-            <th>STT</th>
-            <th>Mã Thẻ Từ</th>
-            <th>Biển Số Xe</th>
-          </tr>
-        </thead>
-        <tbody>
-          <%for (i = 0 ; i < parkings.length;i++){%>
-          <tr>
-            <th scope="row"><%=i+1%></th>
-            <td><%=parkings[i].id_card%></td>
-            <td><%=parkings[i].vehicle_number%></td>
-          </tr>
-          <%}%>
-        </tbody>
-      </table>
+    <div class="limiter">
+      <a href="http://localhost:3000/in">Back</a>
+      <div class="container-table100">
+        <div class="wrap-table100">
+          <div class="table100 ver1 m-b-110">
+            <div class="table100-head">
+              <table>
+                <thead>
+                  <tr class="row100 head">
+                    <th class="cell100 column1">STT</th>
+                    <th class="cell100 column2">Mã Thẻ Từ</th>
+                    <th class="cell100 column3">Biển Số Xe</th>
+                    <th class="cell100 column4">Thời gian vào</th>
+                  </tr>
+                </thead>
+              </table>
+            </div>
+
+            <div class="table100-body js-pscroll">
+              <table>
+                <tbody>
+                  <%for (i = 0 ; i < parkings.length;i++){%>
+                  <tr class="row100 body">
+                    <td class="cell100 column1"><%=i+1%></td>
+                    <td class="cell100 column2"><%=parkings[i].id_card%></td>
+                    <td class="cell100 column3">
+                      <%=parkings[i].vehicle_number%>
+                    </td>
+                    <td class="cell100 column4">Time</td>
+                  </tr>
+                  <%}%>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-    <a href="http://localhost:3000/data">Back</a>
   </body>
 </html>
