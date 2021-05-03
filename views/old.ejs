@@ -17,12 +17,12 @@
       }
 
       .form-input {
-        width: 300px;
-        padding: 16px;
+        width: 700px;
+        padding: 10px;
         border: 1px solid #b6b6b6;
         border-radius: 5px;
         float: left;
-        margin: 16px;
+        margin-right: 70px;
       }
 
       .list-car {
@@ -42,7 +42,7 @@
   <body>
     <div class="container-fluid">
       <div class="title">
-        <h1>XE VÀO</h1>
+        <h1>XE RA</h1>
       </div>
     </div>
     <div class="container">
@@ -54,7 +54,7 @@
           alt="Card image cap"
           style="width: 40%; height: 50%"
         />
-        <form action="http://localhost:3000/out" method="POST" id="form">
+        <form action="http://localhost:3000/parking" method="POST" id="form">
           <h4 class="card-title">Thông Tin Xe</h4>
           <div class="form-group">
             <label for="formGroupExampleInput">Mã thẻ từ</label>
@@ -75,17 +75,29 @@
               class="form-control"
               id="formGroupExampleInput2"
               placeholder="Biển số xe"
-              name="plate_number"
+              name="vehicle_number"
               value="<%=data[1] %>"
             />
           </div>
+          <div class="form-group">
+            <label for="formGroupExampleInput2">Thời gian vào</label>
+            <input
+              type="text"
+              class="form-control"
+              id="formGroupExampleInput2"
+              name="time"
+              value="<%=data[2] %>"
+              readonly
+            />
+          </div>
+
           <!-- <button type="submit" class="btn btn-danger">Xóa</button> -->
-          <button type="submit" class="btn btn-primary">Xóa</button>
+          <button type="submit" class="btn btn-primary">Thêm</button>
           <br />
         </form>
         <a href="http://localhost:3000/parking">List parking</a>
         <br />
-        <a href="http://localhost:3000/out">Ra</a>
+        <a href="http://localhost:3000/in">Vao</a>
         <% } %>
       </div>
     </div>
