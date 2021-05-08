@@ -209,7 +209,7 @@ iframe {
 }
 
 .wrap-login100 {
-  width: 960px;
+  width: 80%;
   background: #fff;
   border-radius: 10px;
   overflow: hidden;
@@ -227,17 +227,18 @@ iframe {
 /*------------------------------------------------------------------
 [  ]*/
 .login100-pic {
-  width: 316px;
+  width: 350px;
 }
 
 .login100-pic img {
-  max-width: 130%;
+  max-width: 106%;
 }
 
 /*------------------------------------------------------------------
 [  ]*/
 .login100-form {
   width: 290px;
+  margin-left: 30px;
 }
 
 .login100-form-title {

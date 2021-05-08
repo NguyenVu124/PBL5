@@ -5,11 +5,19 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <!-- <script>
+      $(document).ready(function () {
+        // $("#a").load("http://localhost:3000/in");
+        setInterval(function () {
+          $("#a").load("http://localhost:3000/in");
+        }, 2000);
+      });
+    </script> -->
     <link rel="stylesheet" type="text/css" href="/css/in.css" />
   </head>
   <body>
-    <div class="limiter">
+    <div class="limiter" id="a">
       <div class="container-login100">
         <div class="wrap-login100">
           <div class="login100-pic js-tilt" data-tilt>
@@ -86,9 +94,6 @@
               <a class="txt2" href="http://localhost:3000/parking">
                 List parking
               </a>
-            </div>
-            <div class="text-center p-t-12">
-              <a class="txt2" href="#"> In </a>
             </div>
           </form>
           <% } %>

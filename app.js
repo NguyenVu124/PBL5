@@ -1,6 +1,8 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const formidable = require("formidable");
+const flush = require("connect-flash");
+const session = require("express-session");
 const fs = require("fs");
 const path = require("path");
 const bodyParser = require("body-parser");
@@ -10,10 +12,18 @@ const ParkingLot = require("./model/parking_lot");
 const app = express();
 app.set("view engine", "ejs");
 app.use(express.json());
-// app.use(express.static("public"));
 app.use(express.static(__dirname + "/public"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(
+  session({
+    secret: "secret",
+    cookie: { maxAge: 60000 },
+    resave: false,
+    saveUninitialized: false,
+  })
+);
+app.use(flush());
 
 app.get("/", async (req, res) => {
   let row = [];
@@ -30,19 +40,6 @@ app.get("/parking", async (req, res) => {
     res.render("listParking", { parkings });
   } catch (err) {
     console.log(err);
-    res.status(500).send();
-  }
-});
-
-app.get("/parking/:id", (req, res) => {
-  const _id = req.params.id;
-  try {
-    const parking = Parking.findById(_id);
-    if (!parking) {
-      return res.status(404).send();
-    }
-    res.send(parking);
-  } catch (error) {
     res.status(500).send();
   }
 });
@@ -111,37 +108,27 @@ app.get("/in", async (req, res) => {
 });
 
 app.get("/out", async (req, res) => {
-  await fs.readdir("./public/out", (err, files) => {
+  var d = new Date();
+  now =
+    d.getFullYear() +
+    "/" +
+    d.getMonth() +
+    "/" +
+    d.getDate() +
+    " " +
+    d.getHours() +
+    ":" +
+    d.getMinutes() +
+    ":" +
+    d.getSeconds();
+  await fs.readdir("./public/in", (err, files) => {
     let row = [];
     row[0] = files[0].split(".")[0];
     row[1] = files[0].split(".")[1];
-    row[3] = "/out/" + files[0];
-    return res.render("out", { data: row });
+    row[2] = now;
+    row[3] = "/in/" + files[0];
+    return res.render("out", { data: row, message: req.flash("message") });
   });
-});
-
-app.post("/out", async (req, res) => {
-  const id_card = req.body.id_card;
-  const plate_number = req.body.plate_number;
-  try {
-    const parking = await Parking.findOne({ id_card });
-
-    if (!parking) {
-      res.redirect("http://localhost:3000/out");
-      return res.status(404).send();
-    }
-
-    if (parking.vehicle_number === plate_number) {
-      await Parking.deleteOne({ id_card });
-      // sendSignal()
-      return res.status(200).send();
-    } else {
-      res.redirect("http://localhost:3000/out");
-      return res.status(404).send();
-    }
-  } catch (error) {
-    return res.status(500).send();
-  }
 });
 
 app.post("/in", async (req, res) => {
@@ -159,30 +146,44 @@ app.post("/in", async (req, res) => {
   });
   console.log(src);
   await timeout(1000);
-  sendImage(src);
+  // sendImage(src);
   return res.send("Received image!");
 });
 
-// app.post("/out", async (req, res) => {
-//   const form = new formidable.IncomingForm();
-//   await form.parse(req, function (err, fields, files) {
-//     var rawData = fs.readFileSync(files.file.path);
-//     var newPath = path.join(__dirname, "public/out") + "/" + files.file.name;
-//     fs.writeFile(newPath, rawData, function (err) {
-//       if (err) console.log(err);
-//     });
-//   });
-//   res.send("Received image!");
-// });
-
-app.post("/parking_lot", async (req, res) => {
-  const parking_lot = new ParkingLot(req.body);
+app.post("/out", async (req, res) => {
+  const id_card = req.body.id_card;
+  const plate_number = req.body.plate_number;
   try {
-    await parking_lot.save();
-    res.send(parking_lot);
-    res.status(201).send();
+    const parking = await Parking.findOne({ id_card });
+    const lot = await ParkingLot.findOne({ id_card });
+    if (!parking && !lot) {
+      req.flash("message", "Không có dữ liệu!");
+      return res.status(404).redirect("http://localhost:3000/out");
+    }
+    if (parking.vehicle_number === plate_number) {
+      const position = lot.position;
+      await Parking.deleteOne({ id_card });
+      await ParkingLot.updateOne(
+        { position },
+        {
+          position,
+          id_card: "",
+          status: false,
+        },
+        (err) => {
+          if (err) console.log(err);
+        }
+      );
+      // sendSignal()
+      req.flash("message", "Xóa thành công!");
+      return res.status(200).redirect("http://localhost:3000/out");
+    } else {
+      req.flash("message", "Xóa không thành công!");
+      return res.status(404).redirect("http://localhost:3000/out");
+    }
   } catch (error) {
-    res.status(400).send(error);
+    console.log(error);
+    return res.status(500).send();
   }
 });
 

@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const ParkingLot = new mongoose.Schema({
   position: {
-    type: Number,
+    type: String,
     required: true,
   },
   id_card: {
