@@ -15,7 +15,7 @@
 //   });
 // }
 
-const open_barrier = document.getElementById("open");
-open_barrier.addEventListener("click", function () {
-  console.log("Open barrier");
-});
+// const open_barrier = document.getElementById("open");
+// open_barrier.addEventListener("click", function () {
+//   console.log("Open barrier");
+// });
