@@ -308,12 +308,14 @@ async function hintLot() {
 }
 
 mongoose.connect(
-  "mongodb://127.0.0.1:27017/pbl5",
+  "mongodb+srv://nguyenvu124:nguyenvu124@cluster0.ewmlf.mongodb.net/pbl5?retryWrites=true&w=majority",
   { useNewUrlParser: true, useUnifiedTopology: true },
   (req, res) => {
     console.log("Connected to DB!");
   }
 );
+
+// mongodb://127.0.0.1:27017/pbl5
 
 app.listen(process.env.PORT || 3000, () => {
   console.log("Listening to 3000...");
