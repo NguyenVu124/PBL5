@@ -9,6 +9,7 @@ const bodyParser = require("body-parser");
 const http = require("http");
 const Parking = require("./model/parking");
 const ParkingLot = require("./model/parking_lot");
+const History = require("./model/history");
 const app = express();
 app.set("view engine", "ejs");
 app.use(express.json());
@@ -26,11 +27,14 @@ app.use(
 app.use(flush());
 
 app.get("/", async (req, res) => {
-  let row = [];
-  row[0] = "";
-  row[1] = "";
-  row[3] = "";
-  res.render("in", { data: row });
+  try {
+    let history = [];
+    history = await History.find({}).lean();
+    res.render("history", { history });
+  } catch (err) {
+    console.log(err);
+    res.status(500).send();
+  }
 });
 
 app.get("/parking", async (req, res) => {
@@ -38,6 +42,17 @@ app.get("/parking", async (req, res) => {
     let parkings = [];
     parkings = await Parking.find({}).lean();
     res.render("listParking", { parkings });
+  } catch (err) {
+    console.log(err);
+    res.status(500).send();
+  }
+});
+
+app.get("/history", async (req, res) => {
+  try {
+    let history = [];
+    history = await History.find({}).lean();
+    res.render("history", { history });
   } catch (err) {
     console.log(err);
     res.status(500).send();
@@ -58,8 +73,22 @@ app.get("/parking_lots", (req, res) => {
 });
 
 app.post("/parking", async (req, res) => {
+  let path = "";
   const position = await hintLot();
   const parking = new Parking(req.body);
+  let history = new History();
+  history.id_random = req.body.id_random;
+  history.id_card = req.body.id_card;
+  history.vehicle_number = req.body.vehicle_number;
+  history.time_in = req.body.time;
+  history.time_out = "";
+  await fs.readdir("./public/in", (err, files) => {
+    path = files[0];
+    history.image.data = fs.readFileSync("./public/in/" + path, {
+      encoding: "utf8",
+    });
+  });
+  history.image.contentType = "image/jpg";
   try {
     await parking.save();
     await ParkingLot.updateOne(
@@ -73,6 +102,7 @@ app.post("/parking", async (req, res) => {
         if (err) console.log(err);
       }
     );
+    await history.save();
     res.redirect("http://localhost:3000/");
     // sendSignal();
     res.status(201).send();
@@ -153,6 +183,7 @@ app.post("/in", async (req, res) => {
 app.post("/out", async (req, res) => {
   const id_card = req.body.id_card;
   const plate_number = req.body.plate_number;
+
   try {
     const parking = await Parking.findOne({ id_card });
     const lot = await ParkingLot.findOne({ id_card });
@@ -174,11 +205,19 @@ app.post("/out", async (req, res) => {
           if (err) console.log(err);
         }
       );
+      await History.updateOne(
+        { id_random: parking.id_random },
+        {
+          $set: {
+            time_out: timeNow(),
+          },
+        }
+      );
       // sendSignal()
-      req.flash("message", "Xóa thành công!");
+      req.flash("message", "Thành công!");
       return res.status(200).redirect("http://localhost:3000/out");
     } else {
-      req.flash("message", "Xóa không thành công!");
+      req.flash("message", "Không trùng khớp biển số xe và ID thẻ từ!");
       return res.status(404).redirect("http://localhost:3000/out");
     }
   } catch (error) {
@@ -305,6 +344,24 @@ async function hintLot() {
     console.log(err);
     res.status(500).send();
   }
+}
+
+function timeNow() {
+  var d = new Date();
+  now =
+    d.getFullYear() +
+    "/" +
+    d.getMonth() +
+    "/" +
+    d.getDate() +
+    " " +
+    d.getHours() +
+    ":" +
+    d.getMinutes() +
+    ":" +
+    d.getSeconds();
+
+  return now;
 }
 
 mongoose.connect(

@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const Parking = new mongoose.Schema({
+const History = new mongoose.Schema({
   id_random: {
     type: String,
     required: true,
@@ -13,10 +13,17 @@ const Parking = new mongoose.Schema({
     type: String,
     required: true,
   },
-  time: {
+  time_in: {
     type: String,
     required: true,
   },
+  time_out: {
+    type: String,
+  },
+  image: {
+    data: Buffer,
+    contentType: String,
+  },
 });
 
-module.exports = mongoose.model("parking", Parking);
+module.exports = mongoose.model("history", History);

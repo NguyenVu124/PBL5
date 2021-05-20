@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Lịch sử ra vào</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="vendor/bootstrap/css/bootstrap.min.css"
+    />
+
+    <link rel="stylesheet" type="text/css" href="css/list.css" />
+  </head>
+  <body>
+    <div class="limiter">
+      <a href="http://localhost:3000/in">Back</a>
+      <div class="container-table100">
+        <div class="wrap-table100">
+          <div class="table100 ver1 m-b-110">
+            <div class="table100-head">
+              <table>
+                <thead>
+                  <tr class="row100 head">
+                    <th class="cell100 column1">STT</th>
+                    <th class="cell100 column2">Mã Thẻ Từ</th>
+                    <th class="cell100 column3">Biển Số Xe</th>
+                    <th class="cell100 column4">Thời gian vào</th>
+                    <th class="cell100 column4">Thời gian ra</th>
+                    <th class="cell100 column4">Ảnh</th>
+                  </tr>
+                </thead>
+              </table>
+            </div>
+
+            <div class="table100-body js-pscroll">
+              <table>
+                <tbody>
+                  <%for (i = 0 ; i < history.length;i++){%>
+                  <tr class="row100 body">
+                    <td class="cell100 column1"><%=i+1%></td>
+                    <td class="cell100 column2"><%=history[i].id_card%></td>
+                    <td class="cell100 column3">
+                      <%=history[i].vehicle_number%>
+                    </td>
+                    <td class="cell100 column4"><%=history[i].time_in%></td>
+                    <td class="cell100 column4"><%=history[i].time_out%></td>
+                    <td class="cell100 column4"><a href="">Xem</a></td>
+                  </tr>
+                  <%}%>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
