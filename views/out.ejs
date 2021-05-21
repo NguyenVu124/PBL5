@@ -7,14 +7,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
-    <!-- <script>
-      $(document).ready(function () {
-        // $("#a").load("http://localhost:3000/out");
-        setInterval(function () {
-          $("#a").load("http://localhost:3000/out");
+    <script>
+      // $(document).ready(function () {
+      //   // $("#a").load("http://localhost:3000/out");
+      //   setInterval(function () {
+      //     $("#a").load("http://localhost:3000/out");
+      //   }, 2000);
+      // });
+      var my_interval;
+      function start_interval() {
+        my_interval = setInterval(function () {
+          $("#a").load("http://localhost:3000/in");
         }, 2000);
-      });
-    </script> -->
+      }
+    </script>
     <link rel="stylesheet" type="text/css" href="/css/in.css" />
     <link rel="stylesheet" type="text/css" href="/css/button.css" />
   </head>
@@ -67,6 +73,7 @@
                 type="text"
                 name="plate_number"
                 value="<%=data[1] %>"
+                id="b"
               />
               <span class="focus-input100"></span>
               <span class="symbol-input100">
@@ -103,30 +110,27 @@
                 </a>
               </div>
             </div>
-            <!-- <div class="type-1" style="margin-left: -80px" id="open">
-              <div>
-                <a href="" class="btn btn-1">
-                  <span class="txt">Hover me</span>
-                  <span class="round"><i class="fa fa-chevron-right"></i></span>
-                </a>
-              </div>
-            </div> -->
-
             <div class="text-center p-t-12">
               <a class="txt2" href="http://localhost:3000/parking">
                 List parking
               </a>
+              <br />
+              <a class="txt2" href="http://localhost:3000"> History </a>
             </div>
           </form>
           <% } %>
-          <!-- <div class="text-center p-t-12">
-            <button id="open" style="text-decoration: underline">
-              Mở barrier
-            </button>
-          </div> -->
         </div>
       </div>
     </div>
   </body>
-  <script src="/client.js"></script>
+  <script>
+    document.getElementById("b").addEventListener("focus", (e) => {
+      console.log("focus");
+      clearInterval(my_interval);
+    });
+    document.getElementById("b").addEventListener("focusout", (e) => {
+      console.log("no focus");
+      start_interval();
+    });
+  </script>
 </html>

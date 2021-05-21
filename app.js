@@ -202,5 +202,5 @@ mongoose.connect(
 // mongodb://127.0.0.1:27017/pbl5
 
 app.listen(process.env.PORT || 3000, () => {
-  console.log("Listening to 3000...");
+  console.log("Server in running!");
 });

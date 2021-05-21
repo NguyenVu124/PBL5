@@ -21,6 +21,7 @@
       }
     </script>
     <link rel="stylesheet" type="text/css" href="/css/in.css" />
+    <link rel="stylesheet" type="text/css" href="/css/button.css" />
   </head>
   <body>
     <div class="limiter" id="a">
@@ -114,13 +115,20 @@
             <div class="container-login100-form-btn">
               <button class="login100-form-btn">Xác nhận</button>
             </div>
-
+            <div class="container-login100-form-btn" id="open">
+              <div>
+                <a href="" class="login100-form-btn">
+                  <span class="txt">Open barrier</span>
+                  <span class="round"><i class="fa fa-chevron-right"></i></span>
+                </a>
+              </div>
+            </div>
             <div class="text-center p-t-12">
               <a class="txt2" href="http://localhost:3000/parking">
                 List parking
               </a>
               <br />
-              <a class="txt2" href="http://localhost:3000/history"> History </a>
+              <a class="txt2" href="http://localhost:3000"> History </a>
             </div>
           </form>
           <% } %>
@@ -139,15 +147,6 @@
       //   .on("focus", "#form", function (event) {
       //     clearInterval(my_interval);
       //   });
-
-      // document.getElementById("form").addEventListener("focus", (e) => {
-      //   console.log("focus");
-      //   clearInterval(my_interval);
-      // });
-      // document.getElementById("form").addEventListener("focusout", (e) => {
-      //   console.log("no focus");
-      //   start_interval();
-      // });
 
       document.getElementById("b").addEventListener("focus", (e) => {
         console.log("focus");
