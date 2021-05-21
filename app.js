@@ -10,6 +10,15 @@ const http = require("http");
 const Parking = require("./model/parking");
 const ParkingLot = require("./model/parking_lot");
 const History = require("./model/history");
+const {
+  renameFile,
+  sendImage,
+  sendSignal,
+  timeout,
+  deleteIfExist,
+  hintLot,
+  timeNow,
+} = require("./helpers/functions");
 const app = express();
 app.set("view engine", "ejs");
 app.use(express.json());
@@ -44,30 +53,6 @@ app.get("/parking", async (req, res) => {
     res.render("listParking", { parkings });
   } catch (err) {
     console.log(err);
-    res.status(500).send();
-  }
-});
-
-app.get("/history", async (req, res) => {
-  try {
-    let history = [];
-    history = await History.find({}).lean();
-    res.render("history", { history });
-  } catch (err) {
-    console.log(err);
-    res.status(500).send();
-  }
-});
-
-app.get("/parking_lots", (req, res) => {
-  try {
-    ParkingLot.find({}, function (err, all) {
-      if (err) {
-        res.status(404).send();
-      }
-      res.send(all);
-    });
-  } catch (error) {
     res.status(500).send();
   }
 });
@@ -113,49 +98,22 @@ app.post("/parking", async (req, res) => {
 });
 
 app.get("/in", async (req, res) => {
-  var d = new Date();
-  now =
-    d.getFullYear() +
-    "/" +
-    d.getMonth() +
-    "/" +
-    d.getDate() +
-    " " +
-    d.getHours() +
-    ":" +
-    d.getMinutes() +
-    ":" +
-    d.getSeconds();
-
   await fs.readdir("./public/in", (err, files) => {
     let row = [];
     row[0] = files[0].split(".")[0];
     row[1] = files[0].split(".")[1];
-    row[2] = now;
+    row[2] = timeNow();
     row[3] = "/in/" + files[0];
     return res.render("in", { data: row });
   });
 });
 
 app.get("/out", async (req, res) => {
-  var d = new Date();
-  now =
-    d.getFullYear() +
-    "/" +
-    d.getMonth() +
-    "/" +
-    d.getDate() +
-    " " +
-    d.getHours() +
-    ":" +
-    d.getMinutes() +
-    ":" +
-    d.getSeconds();
   await fs.readdir("./public/in", (err, files) => {
     let row = [];
     row[0] = files[0].split(".")[0];
     row[1] = files[0].split(".")[1];
-    row[2] = now;
+    row[2] = timeNow();
     row[3] = "/in/" + files[0];
     return res.render("out", { data: row, message: req.flash("message") });
   });
@@ -233,137 +191,6 @@ app.post("/getBack", async (req, res) => {
   res.status(200).send();
 });
 
-// ----------------------------------test------------------------------
-app.get("/test", async (req, res) => {});
-app.post("/data", async (req, res) => {
-  sendImage();
-  res.redirect("http://localhost:3000/data");
-});
-// ----------------------------------test------------------------------
-
-async function renameFile(newName) {
-  let old = "";
-  await fs.readdir("./public/in", (err, files) => {
-    old = files[0];
-  });
-  await timeout(10);
-  fs.renameSync(
-    `./public/in/${old}`,
-    `./public/in/${old.split(".")[0]}.${newName}.jpg`
-  );
-}
-
-async function sendImage(src) {
-  var FormData = require("form-data");
-
-  var form = new FormData();
-  form.append("file", fs.createReadStream(src));
-  // __dirname + `/public/in/${image}`
-  form.append("message", "Controller");
-
-  var options = {
-    host: "192.168.1.3",
-    port: 5000,
-    path: "/data",
-    method: "POST",
-    headers: form.getHeaders(),
-  };
-
-  var request = http.request(options, function (res) {
-    console.log(res);
-  });
-
-  form.pipe(request);
-
-  request.on("error", function (error) {
-    console.log(error);
-  });
-}
-
-function sendSignal() {
-  const data = JSON.stringify({
-    todo: "Open barrier",
-  });
-
-  const options = {
-    hostname: "192.168.1.6",
-    port: 5000,
-    path: "/test",
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Content-Length": data.length,
-    },
-  };
-
-  const request = http.request(options, (response) => {
-    console.log(`statusCode: ${response.statusCode}`);
-
-    response.on("data", (d) => {
-      process.stdout.write(d);
-    });
-  });
-
-  request.on("error", (error) => {
-    console.error(error);
-  });
-
-  request.write(data);
-  request.end();
-}
-
-function timeout(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-function deleteIfExist() {
-  fs.readdir("./public/in", function (err, files) {
-    if (err) {
-      console.log(err);
-    } else {
-      if (!files.length) {
-        return false;
-      } else {
-        for (const file of files) {
-          fs.unlink(path.join("./public/in", file), (err) => {
-            if (err) throw err;
-          });
-        }
-        return true;
-      }
-    }
-  });
-}
-
-async function hintLot() {
-  try {
-    let lots = [];
-    lots = await ParkingLot.find({ status: false }).lean();
-    return lots[0].position;
-  } catch (err) {
-    console.log(err);
-    res.status(500).send();
-  }
-}
-
-function timeNow() {
-  var d = new Date();
-  now =
-    d.getFullYear() +
-    "/" +
-    d.getMonth() +
-    "/" +
-    d.getDate() +
-    " " +
-    d.getHours() +
-    ":" +
-    d.getMinutes() +
-    ":" +
-    d.getSeconds();
-
-  return now;
-}
-
 mongoose.connect(
   "mongodb+srv://nguyenvu124:nguyenvu124@cluster0.ewmlf.mongodb.net/pbl5?retryWrites=true&w=majority",
   { useNewUrlParser: true, useUnifiedTopology: true },
@@ -371,7 +198,7 @@ mongoose.connect(
     console.log("Connected to DB!");
   }
 );
-
+// mongodb+srv://nguyenvu124:nguyenvu124@cluster0.ewmlf.mongodb.net/pbl5?retryWrites=true&w=majority
 // mongodb://127.0.0.1:27017/pbl5
 
 app.listen(process.env.PORT || 3000, () => {

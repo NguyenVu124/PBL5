@@ -13,6 +13,12 @@
       //     $("#a").load("http://localhost:3000/in");
       //   }, 2000);
       // });
+      var my_interval;
+      function start_interval() {
+        my_interval = setInterval(function () {
+          $("#a").load("http://localhost:3000/in");
+        }, 2000);
+      }
     </script>
     <link rel="stylesheet" type="text/css" href="/css/in.css" />
   </head>
@@ -25,6 +31,7 @@
           </div>
 
           <form
+            id="form"
             class="login100-form validate-form"
             action="http://localhost:3000/parking"
             method="POST"
@@ -77,6 +84,7 @@
                 type="text"
                 name="vehicle_number"
                 value="<%=data[1] %>"
+                id="b"
               />
               <span class="focus-input100"></span>
               <span class="symbol-input100">
@@ -89,6 +97,7 @@
             <div
               class="wrap-input100 validate-input"
               data-validate="Password is required"
+              id="time"
             >
               <input
                 class="input100"
@@ -121,7 +130,33 @@
     <script>
       document.getElementById("random").value =
         "vehicle" + Math.floor(Math.random() * 1000);
-      console.log(document.getElementById("random").value);
+      // console.log(document.getElementById("random").value);
+
+      // $("body")
+      //   .on("focusout", "#form", function (event) {
+      //     start_interval();
+      //   })
+      //   .on("focus", "#form", function (event) {
+      //     clearInterval(my_interval);
+      //   });
+
+      // document.getElementById("form").addEventListener("focus", (e) => {
+      //   console.log("focus");
+      //   clearInterval(my_interval);
+      // });
+      // document.getElementById("form").addEventListener("focusout", (e) => {
+      //   console.log("no focus");
+      //   start_interval();
+      // });
+
+      document.getElementById("b").addEventListener("focus", (e) => {
+        console.log("focus");
+        clearInterval(my_interval);
+      });
+      document.getElementById("b").addEventListener("focusout", (e) => {
+        console.log("no focus");
+        start_interval();
+      });
     </script>
   </body>
 </html>
