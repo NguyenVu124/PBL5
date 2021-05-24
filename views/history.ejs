@@ -15,7 +15,9 @@
   </head>
   <body>
     <div class="limiter">
-      <a href="http://localhost:3000/in">Back</a>
+      <a href="http://localhost:3000/in">Vào</a>
+      <br />
+      <a href="http://localhost:3000/out">Ra</a>
       <div class="container-table100">
         <div class="wrap-table100">
           <div class="table100 ver1 m-b-110">
@@ -46,7 +48,12 @@
                     </td>
                     <td class="cell100 column4"><%=history[i].time_in%></td>
                     <td class="cell100 column4"><%=history[i].time_out%></td>
-                    <td class="cell100 column4"><a href="">Xem</a></td>
+                    <td class="cell100 column4">
+                      <a
+                        href="http://localhost:3000/history/<%=history[i].id_random%>"
+                        >Xem</a
+                      >
+                    </td>
                   </tr>
                   <%}%>
                 </tbody>

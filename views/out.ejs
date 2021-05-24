@@ -17,7 +17,7 @@
       var my_interval;
       function start_interval() {
         my_interval = setInterval(function () {
-          $("#a").load("http://localhost:3000/in");
+          $("#a").load("http://localhost:3000/out");
         }, 2000);
       }
     </script>
@@ -31,6 +31,9 @@
           <div class="login100-pic js-tilt" data-tilt>
             <img src="<%=data[3] %>" alt="IMG" />
           </div>
+          <!-- <div class="login100-pic js-tilt" data-tilt>
+            <img src="<%=data[3] %>" alt="IMG" />
+          </div> -->
 
           <% if(message.length > 0){%>
           <div style="color: red"><%= message %></div>
@@ -81,7 +84,7 @@
               </span>
             </div>
             <div class="text-center p-t-12">
-              <span>Thời gian vào</span>
+              <span>Thời gian ra</span>
             </div>
             <div
               class="wrap-input100 validate-input"
@@ -119,6 +122,7 @@
             </div>
           </form>
           <% } %>
+          <!-- <h2 style="margin-right: 120px">Check</h2> -->
         </div>
       </div>
     </div>

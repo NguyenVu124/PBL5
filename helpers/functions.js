@@ -1,3 +1,5 @@
+const http = require("http");
+const ParkingLot = require("../model/parking_lot");
 async function renameFile(newName) {
   let old = "";
   await fs.readdir("./public/in", (err, files) => {
@@ -99,7 +101,7 @@ async function hintLot() {
     return lots[0].position;
   } catch (err) {
     console.log(err);
-    res.status(500).send();
+    // res.status(500).send();
   }
 }
 

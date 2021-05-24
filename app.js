@@ -57,6 +57,21 @@ app.get("/parking", async (req, res) => {
   }
 });
 
+app.get("/history/:id_random", async (req, res) => {
+  const id_random = req.params.id_random;
+  let history = await History.findOne({ id_random }, (err, item) => {
+    if (err) {
+      console.log(err);
+      res.status(500).send("An error occurred", err);
+    } else {
+      const vehicle_number = item.vehicle_number;
+      let data = item.image.data;
+      base64 = Buffer.from(data).toString("base64");
+      res.render("image", { item: { base64, vehicle_number } });
+    }
+  });
+});
+
 app.post("/parking", async (req, res) => {
   let path = "";
   const position = await hintLot();
@@ -69,9 +84,7 @@ app.post("/parking", async (req, res) => {
   history.time_out = "";
   await fs.readdir("./public/in", (err, files) => {
     path = files[0];
-    history.image.data = fs.readFileSync("./public/in/" + path, {
-      encoding: "utf8",
-    });
+    history.image.data = fs.readFileSync("./public/in/" + path);
   });
   history.image.contentType = "image/jpg";
   try {
@@ -119,6 +132,12 @@ app.get("/out", async (req, res) => {
   });
 });
 
+app.get("/checkInvalid", async (req, res) => {
+  return res.render("checkInvalid", {
+    message: req.flash("message"),
+  });
+});
+
 app.post("/in", async (req, res) => {
   let src = "";
   const form = new formidable.IncomingForm();
@@ -130,12 +149,12 @@ app.post("/in", async (req, res) => {
       if (err) console.log(err);
       src = newPath;
     });
-    console.log("da nhan tu ras");
+    console.log("Received image form Ras!");
   });
   console.log(src);
   await timeout(1000);
   // sendImage(src);
-  return res.send("Received image!");
+  return res.send("Received image form AI server!");
 });
 
 app.post("/out", async (req, res) => {
@@ -175,8 +194,22 @@ app.post("/out", async (req, res) => {
       req.flash("message", "Thành công!");
       return res.status(200).redirect("http://localhost:3000/out");
     } else {
-      req.flash("message", "Không trùng khớp biển số xe và ID thẻ từ!");
-      return res.status(404).redirect("http://localhost:3000/out");
+      req.flash(
+        "message",
+        "Không trùng khớp biển số xe và ID thẻ từ, vui lòng kiểm tra!"
+      );
+      const id_random = parking.id_random;
+      const check = await History.findOne({ id_random }, (err, item) => {
+        const vehicle_number = item.vehicle_number;
+        let data = item.image.data;
+        base64 = Buffer.from(data).toString("base64");
+        return res.render("checkInvalid", {
+          id_card,
+          vehicle_number,
+          base64,
+          message: req.flash("message"),
+        });
+      });
     }
   } catch (error) {
     console.log(error);
