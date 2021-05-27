@@ -72,6 +72,34 @@ app.get("/history/:id_random", async (req, res) => {
   });
 });
 
+app.get("/in", async (req, res) => {
+  await fs.readdir("./public/in", (err, files) => {
+    let row = [];
+    row[0] = files[0].split(".")[0];
+    row[1] = files[0].split(".")[1];
+    row[2] = timeNow();
+    row[3] = "/in/" + files[0];
+    return res.render("in", { data: row });
+  });
+});
+
+app.get("/out", async (req, res) => {
+  await fs.readdir("./public/in", (err, files) => {
+    let row = [];
+    row[0] = files[0].split(".")[0];
+    row[1] = files[0].split(".")[1];
+    row[2] = timeNow();
+    row[3] = "/in/" + files[0];
+    return res.render("out", { data: row, message: req.flash("message") });
+  });
+});
+
+app.get("/checkInvalid", async (req, res) => {
+  return res.render("checkInvalid", {
+    message: req.flash("message"),
+  });
+});
+
 app.post("/parking", async (req, res) => {
   let path = "";
   const position = await hintLot();
@@ -108,34 +136,6 @@ app.post("/parking", async (req, res) => {
     res.status(400).send(error);
   }
   res.status(200).send();
-});
-
-app.get("/in", async (req, res) => {
-  await fs.readdir("./public/in", (err, files) => {
-    let row = [];
-    row[0] = files[0].split(".")[0];
-    row[1] = files[0].split(".")[1];
-    row[2] = timeNow();
-    row[3] = "/in/" + files[0];
-    return res.render("in", { data: row });
-  });
-});
-
-app.get("/out", async (req, res) => {
-  await fs.readdir("./public/in", (err, files) => {
-    let row = [];
-    row[0] = files[0].split(".")[0];
-    row[1] = files[0].split(".")[1];
-    row[2] = timeNow();
-    row[3] = "/in/" + files[0];
-    return res.render("out", { data: row, message: req.flash("message") });
-  });
-});
-
-app.get("/checkInvalid", async (req, res) => {
-  return res.render("checkInvalid", {
-    message: req.flash("message"),
-  });
 });
 
 app.post("/in", async (req, res) => {
@@ -200,15 +200,19 @@ app.post("/out", async (req, res) => {
       );
       const id_random = parking.id_random;
       const check = await History.findOne({ id_random }, (err, item) => {
-        const vehicle_number = item.vehicle_number;
-        let data = item.image.data;
-        base64 = Buffer.from(data).toString("base64");
-        return res.render("checkInvalid", {
-          id_card,
-          vehicle_number,
-          base64,
-          message: req.flash("message"),
-        });
+        if (err) {
+          console.log(err);
+        } else {
+          const vehicle_number = item.vehicle_number;
+          let data = item.image.data;
+          base64 = Buffer.from(data).toString("base64");
+          return res.render("checkInvalid", {
+            id_card,
+            vehicle_number,
+            base64,
+            message: req.flash("message"),
+          });
+        }
       });
     }
   } catch (error) {
