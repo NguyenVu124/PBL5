@@ -31,13 +31,19 @@
           <div class="login100-pic js-tilt" data-tilt>
             <img src="<%=data[3] %>" alt="IMG" />
           </div>
-          <!-- <div class="login100-pic js-tilt" data-tilt>
-            <img src="<%=data[3] %>" alt="IMG" />
-          </div> -->
 
           <% if(message.length > 0){%>
-          <div style="color: red"><%= message %></div>
+          <div class="login100-pic js-tilt" data-tilt>
+            <img
+              src="data:image/jpg;base64,<%=message%>"
+              alt="Image"
+              style="width: 100%"
+            />
+          </div>
+          <%}%> <% if(success.length > 0){%>
+          <p style="color: red; font-size: larger"><%=success%></p>
           <%}%>
+
           <form
             id="form"
             class="login100-form validate-form"
@@ -121,20 +127,21 @@
               <a class="txt2" href="http://localhost:3000"> History </a>
             </div>
           </form>
-          <% } %>
-          <!-- <h2 style="margin-right: 120px">Check</h2> -->
+          <% } %> <% if(message.length > 0){%>
+          <h2 style="margin-right: 120px">Kiểm tra lại</h2>
+          <%}%>
         </div>
       </div>
     </div>
   </body>
   <script>
-    document.getElementById("b").addEventListener("focus", (e) => {
-      console.log("focus");
-      clearInterval(my_interval);
-    });
-    document.getElementById("b").addEventListener("focusout", (e) => {
-      console.log("no focus");
-      start_interval();
-    });
+    // document.getElementById("b").addEventListener("focus", (e) => {
+    //   console.log("focus");
+    //   clearInterval(my_interval);
+    // });
+    // document.getElementById("b").addEventListener("focusout", (e) => {
+    //   console.log("no focus");
+    //   start_interval();
+    // });
   </script>
 </html>

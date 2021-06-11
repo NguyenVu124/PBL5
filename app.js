@@ -91,7 +91,11 @@ app.get("/out", async (req, res) => {
     row[1] = files[0].split(".")[1];
     row[2] = timeNow();
     row[3] = "/in/" + files[0];
-    return res.render("out", { data: row, message: req.flash("message") });
+    return res.render("out", {
+      data: row,
+      message: req.flash("message"),
+      success: req.flash("success"),
+    });
   });
 });
 
@@ -192,13 +196,9 @@ app.post("/out", async (req, res) => {
         }
       );
       // sendSignal()
-      req.flash("message", "Thành công!");
+      req.flash("success", "Thành công!");
       return res.status(200).redirect("http://localhost:3000/out");
     } else {
-      req.flash(
-        "message",
-        "Không trùng khớp biển số xe và ID thẻ từ, vui lòng kiểm tra!"
-      );
       const id_random = parking.id_random;
       const check = await History.findOne({ id_random }, (err, item) => {
         if (err) {
@@ -207,12 +207,9 @@ app.post("/out", async (req, res) => {
           const vehicle_number = item.vehicle_number;
           let data = item.image.data;
           base64 = Buffer.from(data).toString("base64");
-          return res.render("checkInvalid", {
-            id_card,
-            vehicle_number,
-            base64,
-            message: req.flash("message"),
-          });
+
+          req.flash("message", base64);
+          return res.status(200).redirect("http://localhost:3000/out");
         }
       });
     }
