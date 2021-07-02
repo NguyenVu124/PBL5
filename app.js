@@ -7,9 +7,10 @@ const fs = require("fs");
 const path = require("path");
 const bodyParser = require("body-parser");
 const http = require("http");
-const Parking = require("./model/parking");
+const Parking = require("./model/parkingModel");
 const ParkingLot = require("./model/parking_lot");
 const History = require("./model/history");
+const parkingRouter = require("./routes/parkingRoutes");
 //
 const {
   renameFile,
@@ -36,27 +37,9 @@ app.use(
 );
 app.use(flush());
 
-app.get("/", async (req, res) => {
-  try {
-    let history = [];
-    history = await History.find({}).lean();
-    res.render("history", { history });
-  } catch (err) {
-    console.log(err);
-    res.status(500).send();
-  }
-});
+app.use("/", parkingRouter);
 
-app.get("/parking", async (req, res) => {
-  try {
-    let parkings = [];
-    parkings = await Parking.find({}).lean();
-    res.render("listParking", { parkings });
-  } catch (err) {
-    console.log(err);
-    res.status(500).send();
-  }
-});
+app.use("/parkings", parkingRouter);
 
 app.get("/history/:id_random", async (req, res) => {
   const id_random = req.params.id_random;
@@ -226,16 +209,6 @@ app.post("/getBack", async (req, res) => {
   res.status(200).send();
 });
 
-mongoose.connect(
-  "mongodb+srv://nguyenvu124:nguyenvu124@cluster0.ewmlf.mongodb.net/pbl5?retryWrites=true&w=majority",
-  { useNewUrlParser: true, useUnifiedTopology: true },
-  (req, res) => {
-    console.log("Connected to DB!");
-  }
-);
 // mongodb+srv://nguyenvu124:nguyenvu124@cluster0.ewmlf.mongodb.net/pbl5?retryWrites=true&w=majority
 // mongodb://127.0.0.1:27017/pbl5
-
-app.listen(process.env.PORT || 3000, () => {
-  console.log("Server in running!");
-});
+module.exports = app;
