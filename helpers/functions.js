@@ -1,5 +1,5 @@
 const http = require("http");
-const ParkingLot = require("../model/parking_lot");
+const ParkingLot = require("../model/parkingLotModel");
 async function renameFile(newName) {
   let old = "";
   await fs.readdir("./public/in", (err, files) => {

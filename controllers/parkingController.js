@@ -1,4 +1,9 @@
 const Parking = require("../model/parkingModel");
+const History = require("../model/historyModel");
+const ParkingLot = require("../model/parkingLotModel");
+const fs = require("fs");
+
+const { hintLot } = require("../helpers/functions");
 
 exports.getAllParkings = async (req, res) => {
   try {
@@ -40,7 +45,7 @@ exports.createParking = async (req, res) => {
       }
     );
     await history.save();
-    res.redirect("http://localhost:3000/");
+    res.redirect("http://localhost:3000/parking");
     // sendSignal();
     res.status(201).send();
   } catch (error) {
