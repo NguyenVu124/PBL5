@@ -3,7 +3,7 @@ const History = require("../model/historyModel");
 const ParkingLot = require("../model/parkingLotModel");
 const fs = require("fs");
 
-const { hintLot } = require("../helpers/functions");
+const { hintLot, sendSignal } = require("../helpers/functions");
 
 exports.getAllParkings = async (req, res) => {
   try {
@@ -48,6 +48,8 @@ exports.createParking = async (req, res) => {
     res.redirect("http://localhost:3000/parking");
     // sendSignal();
     res.status(201).send();
+    // req.flash("message", `Vui lòng đỗ xe ở vị trí ${position}`);
+    //  return res.status(201).redirect("http://localhost:3000/out");
   } catch (error) {
     res.status(400).send(error);
   }

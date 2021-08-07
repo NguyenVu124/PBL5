@@ -1,7 +1,7 @@
 const formidable = require("formidable");
 const fs = require("fs");
 const path = require("path");
-const { sendImage, sendSignal } = require("../helpers/functions");
+const { sendImage, deleteIfExist } = require("../helpers/functions");
 
 exports.getInData = async (req, res) => {
   let src = "";

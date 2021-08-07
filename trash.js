@@ -66,5 +66,4 @@
 //     res.status(400).send(error);
 //   }
 // });
-cvxv;
 // git clone --single-branch --branch mockup https://github.com/NguyenVu124/PBL5.git
