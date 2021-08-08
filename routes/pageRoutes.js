@@ -5,5 +5,6 @@ const router = express.Router();
 
 router.route("/in").get(pageController.inFlow);
 router.route("/out").get(pageController.outFlow);
+router.route("/openBarrier").get(pageController.outFlow);
 
 module.exports = router;

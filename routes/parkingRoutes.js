@@ -7,5 +7,9 @@ router
   .route("/")
   .get(parkingController.getAllParkings)
   .post(parkingController.createParking);
+router
+  .route("/checkOut")
+
+  .post(parkingController.checkOut);
 
 module.exports = router;

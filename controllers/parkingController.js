@@ -3,13 +3,14 @@ const History = require("../model/historyModel");
 const ParkingLot = require("../model/parkingLotModel");
 const fs = require("fs");
 
-const { hintLot, sendSignal } = require("../helpers/functions");
+const { hintLot, sendSignal, timeNow } = require("../helpers/functions");
 
 exports.getAllParkings = async (req, res) => {
   try {
     let parkings = [];
     parkings = await Parking.find({}).lean();
     res.render("listParking", { parkings });
+    // sendSignal();
   } catch (err) {
     console.log(err);
     res.status(500).send();
@@ -46,7 +47,7 @@ exports.createParking = async (req, res) => {
     );
     await history.save();
     res.redirect("http://localhost:3000/parking");
-    // sendSignal();
+    sendSignal();
     res.status(201).send();
     // req.flash("message", `Vui lòng đỗ xe ở vị trí ${position}`);
     //  return res.status(201).redirect("http://localhost:3000/out");
@@ -89,7 +90,7 @@ exports.checkOut = async (req, res) => {
           },
         }
       );
-      // sendSignal()
+      sendSignal();
       req.flash("success", "Thành công!");
       return res.status(200).redirect("http://localhost:3000/out");
     } else {

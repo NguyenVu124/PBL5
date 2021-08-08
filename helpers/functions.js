@@ -1,14 +1,16 @@
 const http = require("http");
+const fs = require("fs");
+const path = require("path");
 const ParkingLot = require("../model/parkingLotModel");
 async function renameFile(newName) {
   let old = "";
-  await fs.readdir("./public/in", (err, files) => {
+  await fs.readdir("E:/PBL5/public/in", (err, files) => {
     old = files[0];
   });
-  await timeout(10);
-  fs.renameSync(
-    `./public/in/${old}`,
-    `./public/in/${old.split(".")[0]}.${newName}.jpg`
+  await timeout(100);
+  await fs.renameSync(
+    `E:/PBL5/public/in/${old}`,
+    `E:/PBL5/public/in/${old.split(".")[0]}.${newName}.jpg`
   );
 }
 
@@ -21,7 +23,7 @@ async function sendImage(src) {
   form.append("message", "Controller");
 
   var options = {
-    host: "192.168.1.3",
+    host: "192.168.1.4",
     port: 5000,
     path: "/data",
     method: "POST",
@@ -45,9 +47,9 @@ function sendSignal() {
   });
 
   const options = {
-    hostname: "192.168.1.6",
-    port: 5000,
-    path: "/test",
+    hostname: "192.168.1.3",
+    port: 6000,
+    path: "/open",
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -76,7 +78,7 @@ function timeout(ms) {
 }
 
 function deleteIfExist() {
-  fs.readdir("./public/in", function (err, files) {
+  fs.readdir("E:/PBL5/public/in", function (err, files) {
     if (err) {
       console.log(err);
     } else {
@@ -84,7 +86,7 @@ function deleteIfExist() {
         return false;
       } else {
         for (const file of files) {
-          fs.unlink(path.join("./public/in", file), (err) => {
+          fs.unlink(path.join("E:/PBL5/public/in", file), (err) => {
             if (err) throw err;
           });
         }
@@ -110,7 +112,7 @@ function timeNow() {
   now =
     d.getFullYear() +
     "/" +
-    d.getMonth() +
+    8 +
     "/" +
     d.getDate() +
     " " +
